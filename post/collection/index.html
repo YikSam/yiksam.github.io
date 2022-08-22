@@ -1,0 +1,1015 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>集合 | yiksam</title>
+<link rel="shortcut icon" href="https://yiksam.github.io/favicon.ico?v=1661176520304">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://yiksam.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="集合 | yiksam - Atom Feed" href="https://yiksam.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="集合
+1. Java容器有哪些
+Java 容器分为 Collection 和 Map 两大类，其下又有很多子类，如下所示是Collection和Map的继承体系：
+
+Collection
+
+List
+
+ArrayList
+LinkedLis..." />
+    <meta name="keywords" content="面试" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://yiksam.github.io">
+  <img class="avatar" src="https://yiksam.github.io/images/avatar.png?v=1661176520304" alt="">
+  </a>
+  <h1 class="site-title">
+    yiksam
+  </h1>
+  <p class="site-description">
+    仅作为平时学习总结使用
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/post/catalogue" class="menu">
+          目录
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              集合
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-05-30
+              </span>
+              <span>
+                39 min read
+              </span>
+              
+                <a href="https://yiksam.github.io/tag/y5KpG9zSR/" class="post-tag">
+                  # 面试
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h1 id="集合">集合</h1>
+<h2 id="1-java容器有哪些">1. Java容器有哪些</h2>
+<p>Java 容器分为 <strong>Collection</strong> 和 <strong>Map</strong> 两大类，其下又有很多子类，如下所示是Collection和Map的继承体系：</p>
+<ul>
+<li>Collection
+<ul>
+<li>List
+<ul>
+<li>ArrayList</li>
+<li>LinkedList</li>
+<li>Vector</li>
+<li>Stack</li>
+</ul>
+</li>
+<li>Set
+<ul>
+<li>HashSet</li>
+<li>LinkedHashSet</li>
+<li>TreeSet</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Map
+<ul>
+<li>HashMap</li>
+<li>ConcurrentHashMap</li>
+<li>TreeMap</li>
+<li>HashTable</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-hashmap的数据结构是什么样的">2. HashMap的数据结构是什么样的</h2>
+<p>HashMap本质是一个一定长度的数组，数组中存放的是链表。它是一个Entry类型的数组，Entry的源码：</p>
+<pre><code>static class Node&lt;K,V&gt; implements Map.Entry&lt;K,V&gt; {
+        final int hash; ✅ // 哈希值
+        final K key; 
+        V value;
+        Node&lt;K,V&gt; next; ✅ // 指向下一个元素的引用
+}
+</code></pre>
+<blockquote>
+<p>其中存放了Key，Value，hash值，还有指向下一个元素的引用。</p>
+</blockquote>
+<p>当向HashMap中put(key,value)时，会首先通过hash算法计算出存放到数组中的位置，比如位置索引为i，将其放入到Entry[i]中，如果这个位置上面已经有元素了，那么就将新加入的元素放在链表的头上(JDK1.7 是头插，JDK1.8是尾插)，最先加入的元素在链表尾。</p>
+<p>比如，第一个键值对A进来，通过计 算其key的hash得到的index=0，记做:Entry[0] = A。一会后又进来一个键值对B，通过计算其index 也等于0，现在怎么办?HashMap会这样做:B.next = A,Entry[0] = B,如果又进来C,index也等于0,那 么C.next = B,Entry[0] = C;这样我们发现index=0的地方其实存取了A,B,C三个键值对,他们通过 next这个属性链接在一起,也就是说数组中存储的是最后插入的元素。</p>
+<h2 id="3-hashmap的put方法实现原理源代码讲解">3. HashMap的put方法实现原理(源代码讲解)</h2>
+<p>JDK7中HashMap采 用的是位桶+链表的 方式，即我们常说的 散列链表的方式。<br>
+JDK8中采用的是位 桶+链表/红黑树。<br>
+<img src="https://yiksam.github.io/post-images/1653894358978.png" alt="" loading="lazy"></p>
+<pre><code class="language-java">final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
+                   boolean evict) {
+        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; int n, i;
+        ✅ // 如果table为空，或者没有元素时，扩容。
+        if ((tab = table) == null || (n = tab.length) == 0)
+            n = (tab = resize()).length;
+        ✅ // 如果首结点为空，则创建一个新结点。
+        ✅ // ️注意：(n - 1) &amp; hash才是真正的hash值，也就是存储在table位置的index。
+        ✅ // 在jdk1.6中是封装成indexFor函数。
+        if ((p = tab[i = (n - 1) &amp; hash]) == null)
+            tab[i] = newNode(hash, key, value, null);
+        else { ✅ // 程序到这里，说明碰撞了，那么就要开始处理碰撞。
+            Node&lt;K,V&gt; e; K k;
+            ✅ // 如果在首结点与我们待插入的元素有相同的hash和key值，则先记录。
+            if (p.hash == hash &amp;&amp;
+                ((k = p.key) == key || (key != null &amp;&amp; key.equals(k))))
+                e = p;
+            else if (p instanceof TreeNode) ✅ // 如果首结点的类型是红黑树类型，则按照红黑树方法添加该元素。
+                e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(this, tab, hash, key, value);
+            else { ✅ // 程序到这里，说明首结点类型为链表类型
+                for (int binCount = 0; ; ++binCount) {
+                    ✅ // 如果遍历到末尾，则先在尾部追加该元素结点。
+                    if ((e = p.next) == null) {
+                        p.next = newNode(hash, key, value, null);
+                        ✅ // 当遍历的结点数目大于8时，则采取树化结构。
+                        if (binCount &gt;= TREEIFY_THRESHOLD - 1) // -1 for 1st
+                            treeifyBin(tab, hash);
+                        break;
+                    }
+                    ✅ // 如果找到与待插入的元素具有相同的hash和key，则停止遍历，此时e已经记录了该结点。
+                    if (e.hash == hash &amp;&amp;
+                        ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))
+                        break;
+                    p = e;
+                }
+            }
+            ✅ // 表明记录到具有相同元素的结点。
+            if (e != null) { // existing mapping for key
+                V oldValue = e.value;
+                if (!onlyIfAbsent || oldValue == null)
+                    e.value = value;
+                afterNodeAccess(e); ✅ // 空函数，根据需求覆盖。
+                return oldValue;
+            }
+        }
+        ++modCount;
+        ✅ // 当结点数+1大于threshold时，则进行扩容
+        if (++size &gt; threshold)
+            resize();
+        afterNodeInsertion(evict); ✅ // 空函数，根据需求覆盖。
+        return null;
+    }
+</code></pre>
+<h2 id="4-hashmap的put方法的参数hash是怎么计算的">4. HashMap的put方法的参数hash是怎么计算的</h2>
+<pre><code>static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+}
+</code></pre>
+<ol>
+<li>当key == null时，hash值为0，所以HashMap的key可以为null。<br>
+⚠️ 注：对比HashTable，HashTable对key直接hashCode()，若key为null时，会抛出异常，所以HashTable的key不可为null。</li>
+<li>当key ≠ null时，则通过先计算出 key的hashCode()(记为h)，然后对哈希码进行<strong>扰动处理</strong>：按<strong>位异或(^)</strong> 哈希码自身右移16位后的二进制。</li>
+</ol>
+<h2 id="5-hashmap中插入一条数据如何计算数据的下标呢">5. HashMap中插入一条数据，如何计算数据的下标呢</h2>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>代码实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. 计算哈希码</td>
+<td>h = key.hashCode()</td>
+</tr>
+<tr>
+<td>2. 二次处理哈希码（最终求得键对应的hash值）</td>
+<td>h ^ (h &gt;&gt;&gt; 16)</td>
+</tr>
+<tr>
+<td>3. 最终计算存储的数组位置（根据hash值 &amp; 数组长度 - 1）</td>
+<td>h &amp; (length - 1)</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>
+<p>根据键key，通过hashCode() 计算<br>
+hashCode() 简介</p>
+<ul>
+<li>定义：Object类的方法，即所有Java对象都可以调用。</li>
+<li>作用：根据对象的内存地址，经过特定算法返回一个哈希码。</li>
+<li>意义：保证每个对象的哈希码尽可能不同，从而提高在散列结构存储中查找的效率。</li>
+<li>⚠️注意：可复写，Object类提供的默认实现确保每个对象的hash码不同。</li>
+</ul>
+</li>
+<li>
+<p>扰动处理</p>
+<ul>
+<li>即哈希码异或（^）哈希码自身右移16位后的二进制。</li>
+<li>本质：二次处理低位 = 哈希码的高16位不变，低16位 = 低16位 异或 高16位。（即高位参与低位的计算）</li>
+</ul>
+</li>
+<li>
+<p>二次处理后的哈希码 与运算（&amp;）(数组长度 - 1)</p>
+</li>
+</ol>
+<h2 id="6-为什么hash要进行右移16位的异或计算">6. 为什么hash要进行右移16位的异或计算</h2>
+<p>核心目的是为了让hash值的散列度更高，尽可能减少hash表的hash冲突，从而提升数据查找的性能。<br>
+在HashMap的put方法里面，是通过Key的hash值与数组的长度取模计算得到数组的位置。</p>
+<pre><code>p = tab[i = (n - 1) &amp; hash]
+</code></pre>
+<p>而在绝大部分的情况下，n的值一般都会小于2^16次方，也就是65536。</p>
+<p>所以也就意味着i的值 ， 始终是使用hash值的低16位与(n-1)进行取模运算，这个是由与运算符&amp;的特性决定的。</p>
+<p>这样就会造成key的散列度不高，导致大量的key集中存储在固定的几个数组位置，很显然会影响到数据查找性能。</p>
+<p>因此，为了提升key的hash值的散列度，在hash方法里面，做了位移运算。</p>
+<p>首先使用key的hashCode无符号右移16位，意味着把hashCode的高位移动到了低位。</p>
+<p>然后再用hashCode与右移之后的值进行异或运算。</p>
+<p>让高16位参与运算可以更好的均匀散列，减少碰撞，进一步降低hash冲突的几率。并且使得高16位和低16位的信息都被保留了。</p>
+<p>而在这里采用异或运算而不采用&amp; ，| 运算的原因是 异或运算能更好的保留各部分的特征，如果采用&amp;运算计算出来的值的二进制会向0靠拢，采用|运算计算出来的值的二进制会向1靠拢</p>
+<p>hashcode的数据类型是int。int为4个字节，1个字节8个比特位，int就是32个比特位，所以16是因为32对半的结果，也就是让高的那一半也来参与运算所以选择了16。</p>
+<h2 id="7-为什么用-而不用-和">7.  为什么用 ^ 而不用 &amp; 和 |</h2>
+<p>假设均匀随机(1位)输入，AND函数输出概率分布分别为75% 0和25% 1。相反， OR为25% 0和75% 1。<br>
+XOR函数为50% 0和50% 1，因此对于合并均匀的概率分布非常有用</p>
+<table>
+<thead>
+<tr>
+<th>a</th>
+<th>b</th>
+<th>a AND b</th>
+<th>a OR b</th>
+<th>a XOR b</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-jdk18-hashmap为什么引入红黑树">8. JDK1.8 HashMap为什么引入红黑树</h2>
+<p>由于在JDK1.7之前，HashMap的数据结构为:数组 + 链表。链表来存储hash值一样的key-value. 如果按照链表的方式存储，随着节点的增加数据会越来越多，这会导致查询节点的时间复杂度会逐渐增加，平均时间复杂度<strong>O(n)</strong>。<br>
+为了提高查询效率，故在JDK1.8中引入了改进方法红黑树。此数据结构的平均查询效率为<strong>O(long n)</strong>。</p>
+<h2 id="9-jdk18以后的hashmap为什么在链表长度为8的时候变为红黑树">9. JDK1.8以后的HashMap为什么在链表长度为8的时候变为红黑树</h2>
+<p>在JDK1.8以及以后的版本中，HashMap的底层结构，由原来单纯的的数组+链表，更改为链表长度 为8时，开始由链表转换为红黑树，我们都知道，链表的时间复杂度是<strong>O(n)</strong>，红黑树的时间复杂度<strong>O(logn)</strong>，很显然，红黑树的复杂度是优于链表的。因为树节点所占空间是普通节点的两倍，所以只有当节点足够多的时候，才会使用树节点。也就是说，节点少的时候，尽管时间复杂度上，红黑树比链表好一点，但是红黑树所占空间比较大，综合考虑，认为只能在节点太多的时候，红黑树占空间大这一劣势不太明显的时候，才会舍弃链表，使用红黑树，这也是为什么不直接全部使用红黑树 的原因。</p>
+<ul>
+<li>那为什么选择8才会选择使用红黑树呢?<br>
+在理想状态下，受随机分布的hashCode影响，链表中的节点遵循泊松分布，而且根据统计，链表中节点数是8的概率已经接近千分之一，而且此时链表的性能已经很差了。所以在这种比较罕见和极端的情况下，才会把链表转变为红黑树。因为链表转换为红黑树也是需要消耗性能的，特殊情况特殊处理，为了挽回性能，权衡之下，才使用红黑树，提高性能。</li>
+</ul>
+<h2 id="10-泊松分布是什么">10. 泊松分布是什么?</h2>
+<p>泊松分布的概率函数为:<br>
+<img src="https://yiksam.github.io/post-images/1653902813625.jpg" alt="" loading="lazy"><br>
+泊松分布的参数λ是单位时间(或单位面积)内随机事件的平均发生次数。 泊松分布适合于描述单位时间内随机事件发生的次数。<br>
+泊松分布的期望和方差均为 λ<br>
+特征函数为：<img src="https://yiksam.github.io/post-images/1653903119114.png" alt="" loading="lazy"></p>
+<h2 id="11-如果链表的节点数大于8-就一定会转换为红黑树吗">11. 如果链表的节点数大于8 ，就一定会转换为红黑树吗</h2>
+<pre><code>final void treeifyBin(Node&lt;K,V&gt;[] tab, int hash) {
+        int n, index; Node&lt;K,V&gt; e;
+        ✅ // 先判断table的长度是否小于MIN_TREEIFY_CAPACITY(64)
+        if (tab == null || (n = tab.length) &lt; MIN_TREEIFY_CAPACITY)
+            ✅ // 小于64，扩容
+            resize();
+        else if ((e = tab[index = (n - 1) &amp; hash]) != null) {
+            ✅ // 否则将链表转化为红黑树
+            TreeNode&lt;K,V&gt; hd = null, tl = null;
+            do {
+                TreeNode&lt;K,V&gt; p = replacementTreeNode(e, null);
+                if (tl == null)
+                    hd = p;
+                else {
+                    p.prev = tl;
+                    tl.next = p;
+                }
+                tl = p;
+            } while ((e = e.next) != null);
+            if ((tab[index] = hd) != null)
+                hd.treeify(tab);
+        }
+    }
+</code></pre>
+<h2 id="12-hashmap为什么选用红黑树而不用avl树">12. HashMap为什么选用红黑树而不用AVL树</h2>
+<p>AVL树和红黑树有几点比较和区别：<br>
+1. AVL树是更加严格的平衡，因此可以提供更快的查找速度。一般读取查找密集型任务，适用AVL树。<br>
+2. 红黑树更适合于插入修改密集型任务。<br>
+3. 通常，AVL树的旋转比红黑树的旋转更加难以平衡和调试。</p>
+<ul>
+<li>(1) AVL以及红黑树是高度平衡的树数据结构。它们非常相似，真正的区别在于在任何添加/删除操作时完成的旋转操作次数。</li>
+<li>(2) 两种实现都缩放为a O(lg N)，其中N是叶子的数量，但实际上AVL树在查找密集型任务上更快：利用更好的平衡，树遍历平均更短。另一方面，插入和删除方面，AVL树速度较慢：需要更高的旋转次数才能在修改时正确地重新平衡数据结构。</li>
+<li>(3) 在AVL树中，从根到任何叶子的最短路径和最长路径之间的差异最多为1。在红黑树中，差异可以是2倍。</li>
+<li>(4) 两个都给O(log n)查找，但平衡AVL树可能需要O(log n)旋转，而红黑树将需要最多两次旋转使其达到平衡(尽管可能需要检查O(log n)节点以确定 旋转的位置)。旋转本身是O(1)操作，因为你只是移动指针。</li>
+</ul>
+<h2 id="13-hashmap为什么不直接使用hashcode处理后的哈希值直接作为-table的下标">13. HashMap为什么不直接使用hashCode()处理后的哈希值直接作为 table的下标</h2>
+<p>hashCode()方法返回的是int整数类型，其范围为-(2 ^ 31)~(2 ^ 31 - 1)，约有40亿个映射空间，而HashMap的容量范围是在16（初始化默认值）~2 ^ 30，HashMap 通常情况下是取不到最大值的，并且设备上也难以提供这么多的存储空间，从而导 致通过hashCode()计算出的哈希值可能不在数组大小范围内，进而无法匹配存储位置。<br>
+解决方式: 16位右移</p>
+<h2 id="14-为什么hashmap的数组长度要保证为2的幂次方呢">14. 为什么HashMap的数组长度要保证为2的幂次方呢</h2>
+<ul>
+<li>只有当数组长度为2的幂次方时，h &amp; (length-1)才等价于h%length，即实现了key的定位， 2的幂次方也可以减少冲突次数，提高HashMap的查询效率；</li>
+<li>如果 length 为 2 的次幂，则 length-1 转化为二进制必定是 11111……的形式，在与 h 的 二进制与操作效率会非常的快，而且空间不浪费；如果 length 不是 2 的次幂，比如 length 为 15，则 length - 1 为 14，对应的二进制为 1110，在与 h 与操作，最后一位都为 0 ，而 0001，0011，0101，1001，1011，0111，1101 这几个位置永远都不能存放元素了，空间浪费相当大，更糟的是这种情况中，数组可以使用的位置比数组长度 小了很多，这意味着进一步增加了碰撞的几率，减慢了查询的效率！这样就会造成空 间的浪费。</li>
+</ul>
+<h2 id="15-jdk17-和-jdk18-hashmap有何不同之处">15. jdk1.7 和 jdk1.8 HashMap有何不同之处</h2>
+<p>JDK7:</p>
+<ul>
+<li>HashMap底层是数组加链表的形式</li>
+<li>数组的默认长度为16，加载因子为0.75，也就是 16*0.75=12(阈值)当计算出元素的位置在数组中冲突时，那么会以链表的形式存储新的元素， 新的元素插在链表的头部，然后将链表下移， 也就是将数组中的值赋值给新来的元素</li>
+<li>当数组中12个位置被占据时(也就是达到了阈值)， 同时新插入的元素的插入位置不为空，就会进行扩容 2倍扩容</li>
+<li>并发环境下会产生死锁</li>
+</ul>
+<p>JDK8:</p>
+<ul>
+<li>HashMap底层是数组加链表加红黑树</li>
+<li>数组的默认长度为16，加载因子为0.75，也就是 16*0.75=12(阈值)当计算出元素在数组中的位置相 同时，则生成链表，并将新的元素插入到尾部 （主要是为了红黑树问题），假如链表上元素超 过了8个，那么链表将被改为红黑树，同时也提高了增删查效率</li>
+<li>当数组元素个数达到了阈值，那么此时不需要判断新的元素的位置是否为空，数组都会扩容，2倍扩容</li>
+<li>并发环境下不会产生死锁</li>
+</ul>
+<h2 id="16-hashmap的主要成员变量重要参数">16. HashMap的主要成员变量（重要参数）</h2>
+<ul>
+<li><strong>transient Node&lt;K,V&gt;[] table;</strong></li>
+</ul>
+<blockquote>
+<p>这是一个Node类型的数组（也有称作Hash桶），可以从下面源码中看 到静态内部类Node在这边可以看做就是一个节点，多个Node节点构成链表，当链表长度大于8的时候并且 table长度大于64的时候转换为红黑树。</p>
+</blockquote>
+<ul>
+<li><strong>transient int size;</strong></li>
+</ul>
+<blockquote>
+<p>表示当前HashMap包含的键值对数量</p>
+</blockquote>
+<ul>
+<li><strong>transient int modCount;</strong></li>
+</ul>
+<blockquote>
+<p>表示当前HashMap修改次数</p>
+</blockquote>
+<ul>
+<li><strong>int threshold;</strong></li>
+</ul>
+<blockquote>
+<p>表示当前HashMap能够承受的最多的键值对数量，一旦超过这个数量HashMap就会进行扩容</p>
+</blockquote>
+<ul>
+<li><strong>final float loadFactor;</strong></li>
+</ul>
+<blockquote>
+<p>负载因子，用于扩容</p>
+</blockquote>
+<ul>
+<li><strong>static final int DEFAULT_INITIAL_CAPACITY = 1 &lt;&lt; 4;</strong></li>
+</ul>
+<blockquote>
+<p>默认的table初始容量</p>
+</blockquote>
+<ul>
+<li><strong>static final int MAXIMUM_CAPACITY = 1 &lt;&lt; 30;</strong></li>
+</ul>
+<blockquote>
+<p>table最大容量</p>
+</blockquote>
+<ul>
+<li><strong>static final float DEFAULT_LOAD_FACTOR = 0.75f;</strong></li>
+</ul>
+<blockquote>
+<p>默认的负载因子</p>
+</blockquote>
+<ul>
+<li><strong>static final int TREEIFY_THRESHOLD = 8;</strong></li>
+</ul>
+<blockquote>
+<p>链表长度大于该参数转红黑树</p>
+</blockquote>
+<ul>
+<li><strong>static final int UNTREEIFY_THRESHOLD = 6;</strong></li>
+</ul>
+<blockquote>
+<p>当树的节点数小于该参数转成链表</p>
+</blockquote>
+<ul>
+<li><strong>static final int MIN_TREEIFY_CAPACITY = 64;</strong></li>
+</ul>
+<blockquote>
+<p>可进行树化的 bin 的最小表容量。</p>
+</blockquote>
+<h2 id="17-hashmap-jdk18-与-17-的扩容原理有什么不同">17. HashMap JDK1.8 与 1.7 的扩容原理有什么不同</h2>
+<p>JDK7:</p>
+<ul>
+<li>1.7 中整个扩容过程就是一个取出数组元素（实际数组索引位置上的每个元素是每个独立单向链表的头部，也就是发生 Hash 冲突后最后放入的冲突元素）然后遍历以该元素为头的单向链表元素，依据每个被遍历元素的 hash 值计算其在新数组中的下标然后进行交换（即原来 hash 冲突的单向 链表尾部变成了扩容后单向链表的头部）。</li>
+</ul>
+<p>JDK8:</p>
+<ul>
+<li>在 JDK 1.8 中 HashMap 的扩容操作就显得更加的骚气了， 由于扩容数组的长度是 2 倍关系，所以对于假设初始 tableSize = 4 要扩容到 8 来说就是 0100 到 1000 的变化（左移一位就是 2 倍，在扩容中只用判断原来的 hash 值 与左移动的一位（newtable 的值）按位与操作是 0 或 1 就 行，0 的话索引就不变，1 的话索引变成原索引加上扩容前数组</li>
+</ul>
+<h2 id="18-hashmap-jdk18-扩容原理源代码分析">18. Hashmap JDK1.8 扩容原理源代码分析</h2>
+<pre><code>final Node&lt;K,V&gt;[] resize() {
+        Node&lt;K,V&gt;[] oldTab = table;
+        ✅ // 记住扩容前的数组长度和最大容量
+        int oldCap = (oldTab == null) ? 0 : oldTab.length;
+        int oldThr = threshold;
+        int newCap, newThr = 0;
+        if (oldCap &gt; 0) {
+            ✅ // 超过数组在java中最大容量就无能为力了, 冲突就只能冲突
+            if (oldCap &gt;= MAXIMUM_CAPACITY) {
+                threshold = Integer.MAX_VALUE;
+                return oldTab;
+            }
+            ✅ // 长度和最大容量都扩容为原来的二倍
+            else if ((newCap = oldCap &lt;&lt; 1) &lt; MAXIMUM_CAPACITY &amp;&amp;
+                     oldCap &gt;= DEFAULT_INITIAL_CAPACITY)
+                newThr = oldThr &lt;&lt; 1; // double threshold
+        }
+        else if (oldThr &gt; 0) // initial capacity was placed in threshold
+            newCap = oldThr;
+        else {               // zero initial threshold signifies using defaults
+            newCap = DEFAULT_INITIAL_CAPACITY;
+            newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+        }
+        if (newThr == 0) {
+            float ft = (float)newCap * loadFactor;
+            newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (float)MAXIMUM_CAPACITY ?
+                      (int)ft : Integer.MAX_VALUE);
+        }
+        ✅ // 更新新的最大容量为扩容计算后的最大容量
+        threshold = newThr;
+        @SuppressWarnings({&quot;rawtypes&quot;,&quot;unchecked&quot;})
+        ✅ // 更新扩容后的新数组长度
+        Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])new Node[newCap];
+        table = newTab;
+        if (oldTab != null) {
+            ✅ // 遍历老数组下标索引
+            for (int j = 0; j &lt; oldCap; ++j) {
+                Node&lt;K,V&gt; e;
+                ✅ // 如果老数组对应索引上有元素则取出链表头元素放到e中
+                if ((e = oldTab[j]) != null) {
+                    oldTab[j] = null;
+                    ✅ // 如果老数组j下标处只有一个元素则直接计算新数组中位置并放置
+                    if (e.next == null)
+                        newTab[e.hash &amp; (newCap - 1)] = e;
+                    else if (e instanceof TreeNode)
+                        ✅ // 如果是树结构则进行单独处理
+                        ((TreeNode&lt;K,V&gt;)e).split(this, newTab, j, oldCap);
+                    else { // preserve order
+                        ✅ // 能进到这里说明数组索引j位置上存在哈希冲突的链表结构
+                        Node&lt;K,V&gt; loHead = null, loTail = null;
+                        Node&lt;K,V&gt; hiHead = null, hiTail = null;
+                        Node&lt;K,V&gt; next;
+                        ✅ // 循环处理数组索引j位置上哈希冲突的链表中的每个元素
+                        do {
+                            next = e.next;
+                            ✅ // 判断key的hash值与老数组长度 与(&amp;) 操作后的结果, 决定元素是否放在原索引处还是新索引处
+                            if ((e.hash &amp; oldCap) == 0) {
+                                ✅ // 放在原索引处的建立新链表
+                                if (loTail == null)
+                                    loHead = e;
+                                else
+                                    loTail.next = e;
+                                loTail = e;
+                            }
+                            else {
+                                ✅ // 放在新索引(原索引 + oldCap)处的建立新链表
+                                if (hiTail == null)
+                                    hiHead = e;
+                                else
+                                    hiTail.next = e;
+                                hiTail = e;
+                            }
+                        } while ((e = next) != null);
+                        if (loTail != null) {
+                            ✅ // 放入原索引处
+                            loTail.next = null;
+                            newTab[j] = loHead;
+                        }
+                        if (hiTail != null) {
+                            ✅ // 放入新索引处
+                            hiTail.next = null;
+                            newTab[j + oldCap] = hiHead;
+                        }
+                    }
+                }
+            }
+        }
+        return newTab;
+    }
+</code></pre>
+<p>JDK1.7 中扩容操作时，哈希冲突的数组索引处的旧链表元素扩容到新数组时，如果扩容后索引位置在新数组的索引位置与原数组中索引位置相同，则链表元素会发生倒置（原来链表头扩容后变为尾巴）；而在 JDK1.8 中不会出现链表倒置现象。 其次，由于 JDK1.7 中发生哈希冲突时仅仅采用了链表结构存储冲突元素，所以扩容时仅仅是重新计算其存储位置而已，而 JDK1.8 中为了性能在同一索引处发生哈希冲突到一定程度时链表结构会转换为红黑数结构存储冲突元素，故在扩容时如果当前索引中元素结构是红黑树且元素个数小于链表还原阈值（哈希冲突程度常量）时就会把树形结构缩小或直接还原为链表结构（其实现就是上面代码片段中的 split() 方法）</p>
+<h2 id="19-hashmap-jdk18红黑树扩容情况的split方法">19. HashMap JDK1.8红黑树扩容情况的split方法</h2>
+<pre><code>/**
+ * 扩容后，红黑树的hash分布，只可能存在于两个位置：原索引位置、原索引位置 + oldCap。
+ */
+final void split(HashMap&lt;K,V&gt; map, Node&lt;K,V&gt;[] tab, int index, int bit) {
+            TreeNode&lt;K,V&gt; b = this; ✅ // 拿到调用此方法的TreeNode节点。
+            // Relink into lo and hi lists, preserving order
+            TreeNode&lt;K,V&gt; loHead = null, loTail = null; ✅ // 存储索引位置为：“原索引位置”的节点。
+            TreeNode&lt;K,V&gt; hiHead = null, hiTail = null; ✅ // 存储索引位置为：“原索引位置 + oldCap”的节点。
+            int lc = 0, hc = 0;
+            // ✅ 1. 以调用此方法的节点开始，遍历整个红黑树节点。
+            for (TreeNode&lt;K,V&gt; e = b, next; e != null; e = next) { ✅ // 从b节点开始遍历。
+                next = (TreeNode&lt;K,V&gt;)e.next; ✅ // next赋值为e的下个节点。
+                e.next = null; ✅ // 同时将老表的节点设置为空，以便垃圾回收器回收。
+                ✅ // 2. 如果e的hash值与老表的容量进行 与运算 的值为0，那么扩容后的索引位置与老表的索引位置一样。
+                if ((e.hash &amp; bit) == 0) {
+                    if ((e.prev = loTail) == null) ✅ // 如果loTail为空，代表该节点为第一个节点。
+                        loHead = e; ✅ // 则将loHead赋值为第一个节点。
+                    else
+                        loTail.next = e; ✅ // 否则将该节点添加到loTail的后面。
+                    loTail = e; ✅ // 并将loTail赋值为新增的节点。
+                    ++lc; ✅ // 统计原索引位置的节点个数。
+                }
+                ✅ // 3. 如果e的hash值与老表的容量进行 与运算 的值为1，那么扩容后的索引位置为：原索引位置 + oldCap。
+                else {
+                    if ((e.prev = hiTail) == null) ✅ // 如果hiTail为空，代表该节点为第一个节点。
+                        hiHead = e; ✅ // 则将hiHead赋值为第一个节点。
+                    else
+                        hiTail.next = e; ✅ // 否则将该节点添加到hiTail的后面。
+                    hiTail = e; ✅ // 并将hiTail赋值为新增的节点。
+                    ++hc; ✅ // 统计索引位置为“原索引位置 + oldCap”的节点个数。
+                }
+            }
+
+            ✅ // 4. 如果索引位置为“原索引位置”的节点不为空
+            if (loHead != null) { // “原索引位置”的节点不为空
+                ✅ // 4.1 如果节点数量 &lt;=6 ，则将红黑树转化为链表结构。
+                if (lc &lt;= UNTREEIFY_THRESHOLD)
+                    tab[index] = loHead.untreeify(map);
+                else {
+                    ✅ // 4.2 将原索引位置的节点设置为对应的头节点
+                    tab[index] = loHead;
+                    ✅ // 4.3 如果hiHead不为空，代表原来的红黑树（老表的红黑树由于节点被分到两个位置）已经被改变，需要重新构建新的红黑树。
+                    if (hiHead != null) // (else is already treeified)
+                        ✅ // 4.4 以loHead为根节点，构建新的红黑树
+                        loHead.treeify(tab);
+                }
+            }
+            ✅ // 5. 如果索引位置为“原索引位置 + oldCap”的节点不为空
+            if (hiHead != null) { // 索引位置为“原索引位置 + oldCap”的节点不为空
+                ✅ // 5.1 如果节点数量 &lt;=6 ，则将红黑树转化为链表结构。
+                if (hc &lt;= UNTREEIFY_THRESHOLD)
+                    tab[index + bit] = hiHead.untreeify(map);
+                else {
+                    ✅ // 5.2 将索引位置为“原索引位置 + oldCap”的节点设置为对应的头节点
+                    tab[index + bit] = hiHead;
+                    ✅ // 5.3 如果loHead不为空，代表原来的红黑树（老表的红黑树由于节点被分到两个位置）已经被改变，需要重新构建新的红黑树。
+                    if (loHead != null)
+                        ✅ // 5.4 以hiHead为根节点，构建新的红黑树
+                        hiHead.treeify(tab);
+                }
+            }
+    }
+</code></pre>
+<h2 id="20-string适合做hashmap的key的原因">20. String适合做HashMap的key的原因</h2>
+<p>在《Java 编程思想》中有这么一句话:设计 hashCode() 时最重要的因素就是对同一个对象调用 hashCode() 都应该产生相同的值。<br>
+String 类型的对象对这个条件有着很好的支持，因为 String 对象的 hashCode() 值是根据 String 对象的 内容计算的，并不是根据对象的地址计算。下面是 String 类源码中的 hashCode() 方法:String 对象底 层是一个 final 修饰的 char 类型的数组，hashCode() 的计算是根据字符数组的每个元素进行计算的，所 以内容相同的 String 对象会产生相同的散列码。</p>
+<pre><code>public int hashCode() {
+        int h = hash;
+        if (h == 0 &amp;&amp; value.length &gt; 0) {
+            char val[] = value; ✅ // 获得String对象底层的字符数组
+
+            for (int i = 0; i &lt; value.length; i++) {
+                h = 31 * h + val[i]; ✅ // 在计算的时候加的是int类型的ascii码
+            }
+            hash = h;
+        }
+        return h;
+}
+</code></pre>
+<p>HashMap 内部实现是通过 key 的 hashcode 来确定 value 的存储位置</p>
+<ul>
+<li>第一个原因：天生复写了hashCode方法，根据String对象的内容来计算的 hashCode。</li>
+<li>第二个原因：因为字符串是不可变的，所以当创建字符串时，它的 hashcode 被缓存下来， 不需要再次计算，所以相比于其他对象更快。</li>
+<li>第三个原因：equals方法 string自己就有。</li>
+</ul>
+<h2 id="21-如果我想用自定义的对象做hashmap的key需要进行什么操作">21. 如果我想用自定义的对象做hashmap的key，需要进行什么操作</h2>
+<p>重写hashCode()和equals()方法 看如下代码解析：</p>
+<pre><code>@Getter
+public class Key {
+
+    private Integer id;
+
+    public Key(Integer id) {
+        this.id = id;
+    }
+}
+</code></pre>
+<pre><code>public class HashCodeKey {
+
+    public static void main(String[] args) {
+        Key k1 = new Key(1);
+        Key k2 = new Key(1);
+
+        HashMap&lt;Key, String&gt; hashMap = new HashMap&lt;&gt;();
+        hashMap.put(k1, &quot;Key with id is 1&quot;);
+        System.out.println(hashMap.get(k2));
+    }
+}
+
+// null
+</code></pre>
+<p>当向HashMap中存入k1的时候，首先会调用Key这个类的 hashcode方法，计算它的hash值，随后把k1放入hash值所 指引的内存位置，在Key这个类中没有定义hashcode方法， 就会调用Object类的hashcode方法，而Object类的 hashcode方法返回的hash值是对象的地址。这时用k2去拿 也会计算k2的hash值到相应的位置去拿，由于k1和k2的内 存地址是不一样的，所以用k2拿不到k1的值重写hashcode 方法仅仅能够k1和k2计算得到的hash值相同，调用get方法 的时候会到正确的位置去找，但当出现散列冲突时，在同 一个位置有可能用链表的形式存放冲突元素，这时候就需 要用到equals方法去对比了，由于没有重写equals方法，它 会调用Object类的equals方法，Object的equals方法判断的 是两个对象的内存地址是不是一样，由于k1和k2都是new出 来的，k1和k2的内存地址不相同，所以这时候用k2还是达 不到k1的值。</p>
+<ul>
+<li>重写hashCode和equals方法，</li>
+</ul>
+<pre><code>@Getter
+public class Key {
+
+    private Integer id;
+
+    public Key(Integer id) {
+        this.id = id;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Key key = (Key) o;
+        return Objects.equals(id, key.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+}
+</code></pre>
+<p>结果根据k2能够查到</p>
+<h2 id="22-什么是哈希什么是哈希冲突">22. 什么是哈希，什么是哈希冲突</h2>
+<p>Hash，一般翻译为“散列”，也有直接音译为“哈希”的，这就是把任意长度的输入通过散列 算法，变换成固定长度的输出，该输出就是散列值(哈希值);这种转换是一种压缩映射， 也就是，散列值的空间通常远小于输入的空间，不同的输入可能会散列成相同的输出，所 以不可能从散列值来唯一的确定输入值。简单的说就是一种将任意长度的消息压缩到某一 固定长度的消息摘要的函数。 所有散列函数都有如下一个基本特性:根据同一散列函数计算出的散列值如果不同，那么 输入值肯定也不同。但是，根据同一散列函数计算出的散列值如果相同(哈希冲突情况)， 输入值不一定相同。</p>
+<h2 id="23-解决哈希冲突的方式">23. 解决哈希冲突的方式</h2>
+<ul>
+<li><strong>开放定址法</strong>：就是解决hash冲突的一种方式。它是使用一种 探测方式在整个数组中找到另一个可以存储值的地方。</li>
+<li><strong>链地址法(拉链法)</strong>：HashMap，HashSet其实都是采用的拉链法来解决哈希冲突的，就是在每个位桶 实现的时候，我们采用链表(jdk1.8之后采用链表+红黑树)的数据结构来去存取发生哈希冲突的输入域的关键字</li>
+<li><strong>再散列法</strong>：再散列法其实很简单，就是再使用哈希函数去散列一个输入的时候，输出是同一个位置就 再次散列，直至不发生冲突位置<br>
+⚠️ 缺点:每次冲突都要重新散列，计算时间增加。</li>
+</ul>
+<h2 id="24-开放寻址法的探索方式">24. 开放寻址法的探索方式</h2>
+<ul>
+<li><strong>线性探测</strong>：按顺序决定哈希值时，如果某数据的哈希值已经存在，则在原来哈希值的基础上往后加一个 单位，直至不发生哈希冲突。</li>
+<li><strong>再平方探测</strong>：按顺序决定哈希值时，如果某数据的哈希值已经存在，则在原来哈希值的基础上先加1的平方个单位，若仍然存在则减1的平方个单位。随之是2的平方，3的平方等等。直至不发生哈希冲突。</li>
+<li><strong>伪随机探测</strong>：按顺序决定哈希值时，如果某数据已经存在，通过随机函数随机生成一个数，在原来哈希值 的基础上加上随机数，直至不发生哈希冲突。</li>
+</ul>
+<h2 id="25-开放寻址法和拉链法的优缺点">25. 开放寻址法和拉链法的优缺点</h2>
+<ul>
+<li>开放定址法：容易产生堆积问题;不适于大规模的数据存储；散列函数的设计对冲突会有很大的影响；插入时可能会出现多次冲突的现象，删除的元素是多个冲突元素中的一个，需要对后面的元素作处理，实现较复杂；结点规模很大时会浪费很多空间(再平方探测)；</li>
+<li>链地址法：处理冲突简单，且无堆积现象，平均查找长度短;链表中的结点是动态申请的，适合构造表不能确定长度的情况；相对而言，拉链法的指针域可以忽略不计，因此较开放地址法更加节省空间。插入结点应该在链尾部(jdk1.8)，删除结点比较方便，只需调整指针而不需要对其他冲突元素作调整。</li>
+</ul>
+<h2 id="26-hashmap的查询效率">26. HashMap的查询效率</h2>
+<ul>
+<li>最理想O(1) (没有冲突)</li>
+<li>JDK1.7 最坏情况O(N)</li>
+<li>JDK1.8 最坏是O(logN)</li>
+</ul>
+<h2 id="27-hashmap和hashtable的区别">27. HashMap和HashTable的区别</h2>
+<ul>
+<li>
+<ol>
+<li>继承的父类不同<br>
+Hashtable继承自Dictionary类，而HashMap继承自AbstractMap类。但二者都实现了Map接口</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>线程安全性不同<br>
+javadoc中关于hashmap的一段描述如下:此实现不是同步的。如果多个线程同时访问一个哈希映射， 而其中至少一个线程从结构上修改了该映射，则它必须保持外部同步。<br>
+Hashtable 中的方法是Synchronize的，而HashMap中的方法在缺省情况下是非Synchronize的。 在多线程并发的环境下，可以直接使用Hashtable，不需要自己为它的方法实现同步，但使用 HashMap时就必须要自己增加同步处理。(结构上的修改是指添加或删除一个或多个映射关系的任 何操作;仅改变与实例已经包含的键关联的值不是结构上的修改。)这一般通过对自然封装该映射 的对象进行同步操作来完成。如果不存在这样的对象，则应该使用 Collections.synchronizedMap方 法来“包装”该映射。最好在创建时完成这一操作，以防止对映射进行意外的非同步访问</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>是否提供contains方法<br>
+HashMap把Hashtable的contains方法去掉了，改成containsValue和containsKey，因为contains方 法容易让人引起误解。<br>
+Hashtable则保留了contains，containsValue和containsKey三个方法，其中contains和 containsValue功能相同</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>key和value是否允许null值 其中key和value都是对象，并且不能包含重复key，但可以包含重复的value。 Hashtable中，key和value都不允许出现null值。但是如果在Hashtable中有类似put(null,null)的操作，<br>
+编译同样可以通过，因为key和value都是Object类型，但运行时会抛出NullPointerException异常，这是 JDK的规范规定的。 HashMap中，null可以作为键，这样的键只有一个;可以有一个或多个键所对应的值为null。当get()方法返 回null值时，可能是 HashMap中没有该键，也可能使该键所对应的值为null。因此，在HashMap中不能由 get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。</li>
+</ol>
+</li>
+<li>
+<ol start="5">
+<li>两个遍历方式的内部实现上不同<br>
+Hashtable、HashMap都使用了 Iterator。而由于历史原因，Hashtable还使用了Enumeration的方<br>
+式。</li>
+</ol>
+</li>
+<li>
+<ol start="6">
+<li>hash值不同 哈希值的使用不同，HashTable直接使用对象的hashCode。而HashMap重新计算hash值。</li>
+</ol>
+</li>
+<li>
+<ol start="7">
+<li>内部实现使用的数组初始化和扩容方式不同 HashTable在不指定容量的情况下的默认容量为11，而HashMap为16，Hashtable不要求底层数组的容<br>
+量一定要为2的整数次幂，而HashMap则要求一定为2的整数次幂。 Hashtable扩容时，将容量变为原来的2倍加1，而HashMap扩容时，将容量变为原来的2<br>
+倍。 Hashtable和HashMap它们两个内部实现方式的数组的初始大小和扩容的方式。HashTable中hash 数组默认大小是11，增加的方式是 old * 2 + 1。</li>
+</ol>
+</li>
+</ul>
+<h2 id="28-为什么hashtable扩容方式选为2n1">28. 为什么hashtable扩容方式选为2N+1</h2>
+<p>// TODO</p>
+<h2 id="29-简述你所知道的jdk17与jdk18的hashmap的改动">29. 简述你所知道的jdk1.7与jdk1.8的hashmap的改动</h2>
+<table>
+<thead>
+<tr>
+<th>不同</th>
+<th>JDK 1.7</th>
+<th>JDK 1.8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>存储结构</td>
+<td>数组 + 链表</td>
+<td>数组 + 链表 + 红黑树</td>
+</tr>
+<tr>
+<td>初始化方式</td>
+<td>单独函数：inflateTable()</td>
+<td>直接集成到了扩容函数resize()中</td>
+</tr>
+<tr>
+<td>hash值计算方式</td>
+<td>扰动处理 = 9次扰动 = 4次位运算 + 5次异或运算</td>
+<td>扰动处理 = 2次扰动 = 1次位运算 + 1次异或运算</td>
+</tr>
+<tr>
+<td>存放数据的规则</td>
+<td>无冲突时，存放数组；冲突时，存放链表</td>
+<td>无冲突时，存放数组；冲突 &amp;&amp; 链表长度 &lt; 8 &amp;&amp; table的长度 &lt; 64时，存放单链表；冲突 &amp;&amp; 链表长度 &gt; 8 &amp;&amp; table的长度 &gt;= 64时，树化并存放红黑树；</td>
+</tr>
+<tr>
+<td>插入数据方式</td>
+<td>头插法（先将原位置的数据移到后1位，再插入数据到该位置）</td>
+<td>尾插法（直接插入到链表尾部/红黑树）</td>
+</tr>
+<tr>
+<td>扩容后存储位置的计算方式</td>
+<td>全部按照原来方法进行计算（即 hashCode &gt;&gt;&gt; 扰动函数 &gt;&gt;&gt; (h &amp; length -1) ）</td>
+<td>按照扩容后的规律计算（即 扩容后的位置 = 原位置 OR 原位置 + 旧容量）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="30-负载因子为什么会影响hashmap性能">30. 负载因子为什么会影响HashMap性能</h2>
+<p>首先回忆HashMap的数据结构， 我们都知道有序数组存储数据，对数据的索引效率都很高，但是插入和删除就会有性能 瓶颈，链表存储数据，要一次比较元素来检索出数据，所以索引效率低，但是插入和删 除效率高，两者取长补短就产生了哈希散列这种存储方式，也就是HashMap的存储逻辑.<br>
+而负载因子表示一个散列表的空间的使用程度，有这样一个公式: initailCapacity*loadFactor=HashMap的容量。<br>
+<strong>所以负载因子越大则散列表的装填程度越高，也就是能容纳更多的元素，元素多了，链表大了，所以此时索引效率就会降低。反之，负载因子越小则链表中的数据量就越稀疏，此时会对空间造成浪费，但是此时索引效率高。</strong></p>
+<h2 id="31-jdk17-的concurrenthashmap的数据结构">31. JDK1.7 的ConcurrentHashMap的数据结构</h2>
+<p>ConcurrentHashMap 和 HashMap 思路是差不多的，但是因为它支持并发操作，所以要复杂一<br>
+些。<br>
+整个 ConcurrentHashMap 由一个个 Segment 组成， Segment 代表”部分“或”一段“的<br>
+意思，所以很多地方都会将其描述为分段锁。<br>
+简单理解就是， ConcurrentHashMap 是一个 Segment 数组， Segment 通过继承<br>
+ReentrantLock 来进行加锁，所以每次需要加锁的操作锁住的是一个 segment，这样只要保证每<br>
+个 Segment 是线程安全的，也就实现了全局的线程安全。</p>
+<figure data-type="image" tabindex="1"><img src="https://yiksam.github.io/post-images/1654151835751.png" alt="" loading="lazy"></figure>
+<h2 id="32-concurrenthashmap的构造方法有几个">32. ConcurrentHashMap的构造方法有几个</h2>
+<pre><code>✅ // 无参构造函数
+public ConcurrentHashMap() {
+}
+
+✅ // 可传初始容量大小的构造函数
+public ConcurrentHashMap(int initialCapacity) {
+        if (initialCapacity &lt; 0)
+            throw new IllegalArgumentException();
+        int cap = ((initialCapacity &gt;= (MAXIMUM_CAPACITY &gt;&gt;&gt; 1)) ?
+                   MAXIMUM_CAPACITY :
+                   tableSizeFor(initialCapacity + (initialCapacity &gt;&gt;&gt; 1) + 1));
+        this.sizeCtl = cap;
+}
+
+✅ // 可传入Map的构造函数
+public ConcurrentHashMap(Map&lt;? extends K, ? extends V&gt; m) {
+        this.sizeCtl = DEFAULT_CAPACITY;
+        putAll(m);
+}
+
+✅ // 可设置初始容量，负载因子
+public ConcurrentHashMap(int initialCapacity, float loadFactor) {
+        this(initialCapacity, loadFactor, 1);
+}
+
+✅ // 可设置初始容量，负载因子，并发级别
+public ConcurrentHashMap(int initialCapacity,
+                             float loadFactor, int concurrencyLevel) {
+        if (!(loadFactor &gt; 0.0f) || initialCapacity &lt; 0 || concurrencyLevel &lt;= 0)
+            throw new IllegalArgumentException();
+        if (initialCapacity &lt; concurrencyLevel)   // Use at least as many bins
+            initialCapacity = concurrencyLevel;   // as estimated threads
+        long size = (long)(1.0 + (long)initialCapacity / loadFactor);
+        int cap = (size &gt;= (long)MAXIMUM_CAPACITY) ?
+            MAXIMUM_CAPACITY : tableSizeFor((int)size);
+        this.sizeCtl = cap;
+}
+</code></pre>
+<p>concurrencyLevel：并行级别、并发数、Segment 数，怎么翻译不重要，理解它。默认是 16，也就是说 ConcurrentHashMap 有 16 个 Segments，所以理论上，这个时候，最多可以同时支持 16 个线程并发写，只要它们的操作分别分布在不同的 Segment 上。这个值可以在初始化的时候设置为其他值，但是一旦初始化以后，它是不可以扩容的。<br>
+再具体到每个 Segment 内部，其实每个 Segment 很像之前介绍的 HashMap，不过它要保证线程安全，所以处理起来要麻烦些。</p>
+<h2 id="33-jdk-17的concurrenthashmap是如何进行锁操作的">33. JDK 1.7的ConcurrentHashMap是如何进行锁操作的</h2>
+<p>JDK1.7版本的 ReentrantLock+Segment+HashEntry。写操作的时候可以只对元素所在的Segment 进行加锁即可，不会影响到其他的 Segment，这样，在最理想的情况下， ConcurrentHashMap可以最高同时支持 Segment数量大小的写操作</p>
+<pre><code>✅ // HashEntry：用来存储元素
+static final class HashEntry&lt;K,V&gt; {
+        final int hash;
+        final K key;
+        volatile V value;
+        volatile HashEntry&lt;K,V&gt; next;
+
+        HashEntry(int hash, K key, V value, HashEntry&lt;K,V&gt; next) {
+            this.hash = hash;
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
+}
+
+✅ // Segment桶：Segment继承ReentrantLock，是一个天然的锁
+static final class Segment&lt;K,V&gt; extends ReentrantLock implements Serializable {
+    ......
+    transient volatile HashEntry&lt;K,V&gt;[] table;
+    transient int count;
+    ......
+}
+</code></pre>
+<h2 id="34-jdk18的concurrenthashmap是如何保证并发的">34. JDK1.8的ConcurrentHashMap是如何保证并发的</h2>
+<p>JDK8中ConcurrentHashMap参考了JDK8 HashMap的实现，采用了数组+链表+红黑树的实现方式来设计，内部大量采用CAS操作，这里简要介绍下CAS。<br>
+CAS是compare and swap的缩写，即我们所说的比较交换。cas是一种基于锁的操作，而且是乐观锁。在java中锁分为乐观锁和悲观锁。悲观锁是将资源锁住，等一个之前获得锁的线程释放锁之后， 下一个线程才可以访问。而乐观锁采取了一种宽泛的态度，通过某种方式不加锁来处理资源，比 如通过给记录加version来获取数据，性能较悲观锁有很大的提高。 JDK8中彻底放弃了Segment转而采用的是Node，其设计思想也不再是JDK1.7中的分段锁思想。 Node:保存key，value及key的hash值的数据结构。其中value和next都用volatile修饰，保证并发的 可见性。<br>
+Java8 ConcurrentHashMap结构基本上和Java8的HashMap一样，不过保证线程安全性。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E9%9B%86%E5%90%88">集合</a>
+<ul>
+<li><a href="#1-java%E5%AE%B9%E5%99%A8%E6%9C%89%E5%93%AA%E4%BA%9B">1. Java容器有哪些</a></li>
+<li><a href="#2-hashmap%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84">2. HashMap的数据结构是什么样的</a></li>
+<li><a href="#3-hashmap%E7%9A%84put%E6%96%B9%E6%B3%95%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86%E6%BA%90%E4%BB%A3%E7%A0%81%E8%AE%B2%E8%A7%A3">3. HashMap的put方法实现原理(源代码讲解)</a></li>
+<li><a href="#4-hashmap%E7%9A%84put%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%82%E6%95%B0hash%E6%98%AF%E6%80%8E%E4%B9%88%E8%AE%A1%E7%AE%97%E7%9A%84">4. HashMap的put方法的参数hash是怎么计算的</a></li>
+<li><a href="#5-hashmap%E4%B8%AD%E6%8F%92%E5%85%A5%E4%B8%80%E6%9D%A1%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E6%95%B0%E6%8D%AE%E7%9A%84%E4%B8%8B%E6%A0%87%E5%91%A2">5. HashMap中插入一条数据，如何计算数据的下标呢</a></li>
+<li><a href="#6-%E4%B8%BA%E4%BB%80%E4%B9%88hash%E8%A6%81%E8%BF%9B%E8%A1%8C%E5%8F%B3%E7%A7%BB16%E4%BD%8D%E7%9A%84%E5%BC%82%E6%88%96%E8%AE%A1%E7%AE%97">6. 为什么hash要进行右移16位的异或计算</a></li>
+<li><a href="#7-%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-%E8%80%8C%E4%B8%8D%E7%94%A8-%E5%92%8C">7.  为什么用 ^ 而不用 &amp; 和 |</a></li>
+<li><a href="#8-jdk18-hashmap%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BC%95%E5%85%A5%E7%BA%A2%E9%BB%91%E6%A0%91">8. JDK1.8 HashMap为什么引入红黑树</a></li>
+<li><a href="#9-jdk18%E4%BB%A5%E5%90%8E%E7%9A%84hashmap%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E9%93%BE%E8%A1%A8%E9%95%BF%E5%BA%A6%E4%B8%BA8%E7%9A%84%E6%97%B6%E5%80%99%E5%8F%98%E4%B8%BA%E7%BA%A2%E9%BB%91%E6%A0%91">9. JDK1.8以后的HashMap为什么在链表长度为8的时候变为红黑树</a></li>
+<li><a href="#10-%E6%B3%8A%E6%9D%BE%E5%88%86%E5%B8%83%E6%98%AF%E4%BB%80%E4%B9%88">10. 泊松分布是什么?</a></li>
+<li><a href="#11-%E5%A6%82%E6%9E%9C%E9%93%BE%E8%A1%A8%E7%9A%84%E8%8A%82%E7%82%B9%E6%95%B0%E5%A4%A7%E4%BA%8E8-%E5%B0%B1%E4%B8%80%E5%AE%9A%E4%BC%9A%E8%BD%AC%E6%8D%A2%E4%B8%BA%E7%BA%A2%E9%BB%91%E6%A0%91%E5%90%97">11. 如果链表的节点数大于8 ，就一定会转换为红黑树吗</a></li>
+<li><a href="#12-hashmap%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E7%94%A8%E7%BA%A2%E9%BB%91%E6%A0%91%E8%80%8C%E4%B8%8D%E7%94%A8avl%E6%A0%91">12. HashMap为什么选用红黑树而不用AVL树</a></li>
+<li><a href="#13-hashmap%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8hashcode%E5%A4%84%E7%90%86%E5%90%8E%E7%9A%84%E5%93%88%E5%B8%8C%E5%80%BC%E7%9B%B4%E6%8E%A5%E4%BD%9C%E4%B8%BA-table%E7%9A%84%E4%B8%8B%E6%A0%87">13. HashMap为什么不直接使用hashCode()处理后的哈希值直接作为 table的下标</a></li>
+<li><a href="#14-%E4%B8%BA%E4%BB%80%E4%B9%88hashmap%E7%9A%84%E6%95%B0%E7%BB%84%E9%95%BF%E5%BA%A6%E8%A6%81%E4%BF%9D%E8%AF%81%E4%B8%BA2%E7%9A%84%E5%B9%82%E6%AC%A1%E6%96%B9%E5%91%A2">14. 为什么HashMap的数组长度要保证为2的幂次方呢</a></li>
+<li><a href="#15-jdk17-%E5%92%8C-jdk18-hashmap%E6%9C%89%E4%BD%95%E4%B8%8D%E5%90%8C%E4%B9%8B%E5%A4%84">15. jdk1.7 和 jdk1.8 HashMap有何不同之处</a></li>
+<li><a href="#16-hashmap%E7%9A%84%E4%B8%BB%E8%A6%81%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E9%87%8D%E8%A6%81%E5%8F%82%E6%95%B0">16. HashMap的主要成员变量（重要参数）</a></li>
+<li><a href="#17-hashmap-jdk18-%E4%B8%8E-17-%E7%9A%84%E6%89%A9%E5%AE%B9%E5%8E%9F%E7%90%86%E6%9C%89%E4%BB%80%E4%B9%88%E4%B8%8D%E5%90%8C">17. HashMap JDK1.8 与 1.7 的扩容原理有什么不同</a></li>
+<li><a href="#18-hashmap-jdk18-%E6%89%A9%E5%AE%B9%E5%8E%9F%E7%90%86%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90">18. Hashmap JDK1.8 扩容原理源代码分析</a></li>
+<li><a href="#19-hashmap-jdk18%E7%BA%A2%E9%BB%91%E6%A0%91%E6%89%A9%E5%AE%B9%E6%83%85%E5%86%B5%E7%9A%84split%E6%96%B9%E6%B3%95">19. HashMap JDK1.8红黑树扩容情况的split方法</a></li>
+<li><a href="#20-string%E9%80%82%E5%90%88%E5%81%9Ahashmap%E7%9A%84key%E7%9A%84%E5%8E%9F%E5%9B%A0">20. String适合做HashMap的key的原因</a></li>
+<li><a href="#21-%E5%A6%82%E6%9E%9C%E6%88%91%E6%83%B3%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%AF%B9%E8%B1%A1%E5%81%9Ahashmap%E7%9A%84key%E9%9C%80%E8%A6%81%E8%BF%9B%E8%A1%8C%E4%BB%80%E4%B9%88%E6%93%8D%E4%BD%9C">21. 如果我想用自定义的对象做hashmap的key，需要进行什么操作</a></li>
+<li><a href="#22-%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%88%E5%B8%8C%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81">22. 什么是哈希，什么是哈希冲突</a></li>
+<li><a href="#23-%E8%A7%A3%E5%86%B3%E5%93%88%E5%B8%8C%E5%86%B2%E7%AA%81%E7%9A%84%E6%96%B9%E5%BC%8F">23. 解决哈希冲突的方式</a></li>
+<li><a href="#24-%E5%BC%80%E6%94%BE%E5%AF%BB%E5%9D%80%E6%B3%95%E7%9A%84%E6%8E%A2%E7%B4%A2%E6%96%B9%E5%BC%8F">24. 开放寻址法的探索方式</a></li>
+<li><a href="#25-%E5%BC%80%E6%94%BE%E5%AF%BB%E5%9D%80%E6%B3%95%E5%92%8C%E6%8B%89%E9%93%BE%E6%B3%95%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9">25. 开放寻址法和拉链法的优缺点</a></li>
+<li><a href="#26-hashmap%E7%9A%84%E6%9F%A5%E8%AF%A2%E6%95%88%E7%8E%87">26. HashMap的查询效率</a></li>
+<li><a href="#27-hashmap%E5%92%8Chashtable%E7%9A%84%E5%8C%BA%E5%88%AB">27. HashMap和HashTable的区别</a></li>
+<li><a href="#28-%E4%B8%BA%E4%BB%80%E4%B9%88hashtable%E6%89%A9%E5%AE%B9%E6%96%B9%E5%BC%8F%E9%80%89%E4%B8%BA2n1">28. 为什么hashtable扩容方式选为2N+1</a></li>
+<li><a href="#29-%E7%AE%80%E8%BF%B0%E4%BD%A0%E6%89%80%E7%9F%A5%E9%81%93%E7%9A%84jdk17%E4%B8%8Ejdk18%E7%9A%84hashmap%E7%9A%84%E6%94%B9%E5%8A%A8">29. 简述你所知道的jdk1.7与jdk1.8的hashmap的改动</a></li>
+<li><a href="#30-%E8%B4%9F%E8%BD%BD%E5%9B%A0%E5%AD%90%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%BD%B1%E5%93%8Dhashmap%E6%80%A7%E8%83%BD">30. 负载因子为什么会影响HashMap性能</a></li>
+<li><a href="#31-jdk17-%E7%9A%84concurrenthashmap%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">31. JDK1.7 的ConcurrentHashMap的数据结构</a></li>
+<li><a href="#32-concurrenthashmap%E7%9A%84%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95%E6%9C%89%E5%87%A0%E4%B8%AA">32. ConcurrentHashMap的构造方法有几个</a></li>
+<li><a href="#33-jdk-17%E7%9A%84concurrenthashmap%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E9%94%81%E6%93%8D%E4%BD%9C%E7%9A%84">33. JDK 1.7的ConcurrentHashMap是如何进行锁操作的</a></li>
+<li><a href="#34-jdk18%E7%9A%84concurrenthashmap%E6%98%AF%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E5%B9%B6%E5%8F%91%E7%9A%84">34. JDK1.8的ConcurrentHashMap是如何保证并发的</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://yiksam.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

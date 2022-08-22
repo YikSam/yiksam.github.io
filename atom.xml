@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://yiksam.github.io</id>
+    <title>yiksam</title>
+    <updated>2022-08-22T14:12:12.223Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://yiksam.github.io"/>
+    <link rel="self" href="https://yiksam.github.io/atom.xml"/>
+    <subtitle>仅作为平时学习总结使用</subtitle>
+    <logo>https://yiksam.github.io/images/avatar.png</logo>
+    <icon>https://yiksam.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, yiksam</rights>
+    <entry>
+        <title type="html"><![CDATA[人工智能]]></title>
+        <id>https://yiksam.github.io/post/ai/</id>
+        <link href="https://yiksam.github.io/post/ai/">
+        </link>
+        <updated>2022-06-06T14:55:49.000Z</updated>
+    </entry>
+</feed>
